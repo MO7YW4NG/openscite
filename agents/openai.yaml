@@ -1,0 +1,5 @@
+interface:
+  display_name: "OpenScite"
+  short_description: "Find and classify papers citing a PDF"
+policy:
+  allow_implicit_invocation: false

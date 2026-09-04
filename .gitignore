@@ -1,0 +1,14 @@
+# Local agent installations and state
+.agents/
+.claude/
+skills-lock.json
+
+# Generated OpenScite runs and scratch data
+artifacts/
+tmp/
+/*.pdf
+research/
+
+# Python caches
+__pycache__/
+*.py[cod]
