@@ -31,6 +31,8 @@ Treat `best_oa_location.pdf_url` and OA location URLs as candidates. Download in
 
 OpenAlex cached full-text endpoints may require a key and incur cost; do not use them in keyless mode. If no direct OA PDF succeeds, give the user the best legal DOI/article link in `fulltext-requests.md`.
 
+An interactive browser using the user's existing institutional or VPN session is an opt-in acquisition route after direct OA retrieval fails. Follow the bounded parallel procedure in `references/user-interaction.md`; publisher access must remain user-authorized and browser integration must not become a required dependency.
+
 Downloaded papers keep their original copyright and license. Metadata availability is not permission to redistribute full text.
 
 ## Credentials

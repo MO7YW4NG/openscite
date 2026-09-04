@@ -21,14 +21,14 @@ Reuse the same target, run directory, `N`, mode, and language on every retry. Fo
 
 - `needs_user_selection`: create `target-claims.json` first if needed, then read `references/user-interaction.md`, ask only for shortlist size, and rerun with `--n N`. Suggest 20; reuse an existing positive `N` without asking.
 - `needs_target_claims`: read `target-analysis-packet.json`, extract discrete claims from the target paper, write a JSON array to `target-claims.json`, and rerun. Each item must include `claim_id`, `claim`, and `source`; include population, intervention/exposure, outcome, direction, and page when supported. Do not ask the user for this internal analysis.
-- `needs_abstract_triage`: read `references/ranking.md`, load `triage-context.json` once, and analyze only `triage-pending.jsonl`. Use disjoint sub-agent batches when available. Append results to `triage-results.jsonl`, preserving each ID/hash, then rerun `prepare`.
-- `needs_analysis`: read `references/labeling.md`, load `analysis-context.json` once, and analyze only `analysis-pending.jsonl`. Keep each paper group on one worker. Append one result per statement to `analysis-results.jsonl`, preserving IDs/hashes and setting `label_source: model`, then run:
+- `needs_abstract_triage`: read `references/ranking.md`, load `triage-context.json` once, and analyze only `triage-pending.jsonl`. When sub-agents are available, dispatch up to four disjoint batches in one parallel wave. Append results to `triage-results.jsonl`, preserving each ID/hash, then rerun `prepare`.
+- `needs_analysis`: read `references/labeling.md`, load `analysis-context.json` once, and analyze only `analysis-pending.jsonl`. Keep each paper group on one worker; when sub-agents are available, dispatch up to four paper-group batches in one parallel wave. Append one result per statement to `analysis-results.jsonl`, preserving IDs/hashes and setting `label_source: model`, then run:
 
 ```text
 python "<skill-dir>/scripts/openscite.py" finalize --run-dir "<run-dir>"
 ```
 
-- `needs_user_files`: read `references/user-interaction.md` and present `fulltext-requests.md`; attached files or files placed in `fulltext/inbox/` keep their original names. Rerun the same `prepare` command when files arrive.
+- `needs_user_files`: read `references/user-interaction.md`. When an interactive browser capability is available, ask once whether to use the user's current browser session (including institutional/VPN access) to download the authorized PDFs listed in `fulltext-requests.md`. On opt-in, use the bounded parallel browser procedure; otherwise present the links and accept attachments or files in `fulltext/inbox/`. Keep original filenames and rerun the same `prepare` command after files arrive.
 - `partial` or `complete`: deliver `report.md` and briefly state coverage. `partial` is a valid evidence report when unavailable full text or unbound contexts are explicitly `unknown`.
 
 Only pending rows are retried; valid result rows remain reusable. If `finalize` returns `needs_analysis`, process the regenerated pending file and rerun it.

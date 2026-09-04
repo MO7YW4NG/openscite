@@ -2088,7 +2088,10 @@ def prepare_run(
         next_action = "Analyze analysis-pending.jsonl with analysis-context.json, append valid results to analysis-results.jsonl, then run finalize."
     elif missing_fulltext:
         status = "needs_user_files"
-        next_action = "Ask the user to attach any available requested full text, then rerun prepare."
+        next_action = (
+            "Offer bounded parallel browser-assisted download for the authorized papers in "
+            "fulltext-requests.md; otherwise request attachments, then rerun prepare."
+        )
     elif unknown:
         status = "partial"
         next_action = "Review extraction failures or no-context cases."

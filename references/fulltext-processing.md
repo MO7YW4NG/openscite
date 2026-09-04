@@ -28,12 +28,12 @@ Bibliography-only and topic-only hits are not citation contexts. A readable extr
 
 ## Parallel model work
 
-When sub-agents are available, use disjoint batches for:
+When sub-agents are available and at least two independent batches exist, dispatch up to four workers concurrently for:
 
 1. `triage-context.json` plus `triage-pending.jsonl`: title/abstract priority screening;
 2. `analysis-context.json` plus paper-grouped `analysis-pending.jsonl`: final statement-level stance classification.
 
-Pending files contain only missing or invalid work; `citations.json` is the analysis ledger. The parent writes shared files and validates returned IDs and hashes. Workers return records only. If sub-agents are unavailable, process the same compact pending records in bounded sequential batches.
+Pending files contain only missing or invalid work; `citations.json` is the analysis ledger. Start the worker batches in one parallel wave, keep every paper's statements on one worker, and await the wave before merging. The parent writes shared files and validates returned IDs and hashes. Workers return records only. If sub-agents are unavailable, process the same compact pending records in bounded sequential batches.
 
 Do not ask sub-agents to reread complete PDFs, repeat API pagination, or edit `citations.json`, `citing-works.json`, or `report.md`.
 

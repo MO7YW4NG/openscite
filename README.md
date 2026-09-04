@@ -32,12 +32,13 @@ target PDF
   -> find incoming citations with OpenAlex
   -> prioritize likely contrast/support candidates from abstracts
   -> select top N papers
-  -> retrieve OA full text or request user-provided files
+  -> retrieve OA full text, optionally use an authorized browser session,
+     or request user-provided files
   -> parse and bind exact citation passages
   -> classify each passage and render report.md
 ```
 
-The agent handles this as a resumable workflow. It asks for the shortlist size only when the user has not supplied one, recommends `N=20`, and accepts citing-paper files under their original filenames. If legal full text cannot be downloaded automatically, `fulltext-requests.md` provides the best DOI or article links so the user can supply only the papers they want analyzed.
+The agent handles this as a resumable workflow. It asks for the shortlist size only when the user has not supplied one, recommends `N=20`, and accepts citing-paper files under their original filenames. If direct open-access retrieval fails, the agent can ask to use an available browser automation tool with the user's current institutional or VPN session. Approved browser downloads run in bounded parallel tab batches; the user can decline and use the DOI or article links in `fulltext-requests.md` instead.
 
 Completed metadata, PDF conversions, abstract triage, and stance labels are cached. Rerunning the same analysis processes only missing or invalid work.
 
@@ -100,6 +101,7 @@ Titles and quoted passages remain in their source language. Provider diagnostics
 - Basic OpenAlex queries can run without an API key, although anonymous use has a smaller daily budget than a free authenticated account. See the current [OpenAlex authentication policy](https://help.openalex.org/api/authentication/).
 - Anydoc runs locally as the current `@firecrawl/anydoc` release with `--ocr reject`. `npx` downloads its platform binary on first use; ordinary PDF contents are not sent to Firecrawl.
 - OpenScite downloads only legitimate open-access candidates and validates that a response is a PDF. It does not bypass paywalls or use paid OpenAlex content endpoints.
+- Browser-assisted publisher downloads are opt-in. They use the user's existing authenticated session or institutional VPN and run in batches of up to four tabs. The agent does not request or enter credentials; blocked papers remain unresolved for user handoff.
 - Scanned or image-only PDFs are not uploaded for OCR automatically. Hosted OCR requires explicit user consent; a searchable PDF, HTML/JATS version, or local OCR is preferred.
 - User-provided citing papers keep their filenames and are matched by DOI/title. They are not renamed or moved.
 
@@ -113,6 +115,7 @@ The Skills CLI installs the skill files, not these runtime dependencies:
 | Internet access | Required for OpenAlex metadata and open-access downloads. |
 | Node.js 20+ and `npx` | Recommended default PDF path; runs the latest local Anydoc package. |
 | Poppler (`pdftotext`, `pdfinfo`) | Optional fallback; required for dependable page-aware extraction. |
+| Browser automation | Optional; can retrieve authorized publisher PDFs through the user's existing institutional/VPN session. |
 
 No permanent parser API key is required.
 
@@ -120,7 +123,7 @@ No permanent parser API key is required.
 
 - Abstract triage predicts which papers are worth opening; it does not assign the final stance.
 - A readable paper can still return `unknown` when its in-text citation cannot be reliably bound to the target.
-- Full-text coverage depends on legitimate OA availability or files supplied by the user.
+- Full-text coverage depends on legitimate OA availability, authorized browser access, or files supplied by the user.
 - One citing paper can contain multiple passages with different labels.
 - Exact page locators require `--require-page-aware`, which intentionally uses the Poppler path instead of Anydoc.
 

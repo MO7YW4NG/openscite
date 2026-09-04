@@ -944,6 +944,7 @@ class PrepareIntegrationTests(unittest.TestCase):
             second = prepare_run(config, provider=provider, inspector=inspector)
 
             self.assertEqual(first["status"], "needs_user_files")
+            self.assertIn("browser-assisted", first["run"]["next_action"])
             self.assertEqual(second["status"], "needs_user_files")
             self.assertEqual(
                 (

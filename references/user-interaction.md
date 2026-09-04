@@ -20,7 +20,27 @@ Show the original filename and the smallest useful candidate set with title plus
 
 ## Missing full text
 
-Provide `fulltext-requests.md` and ask for any legally accessible files by attachment or `fulltext/inbox/`.
+When `fulltext-requests.md` is non-empty, inspect prior messages for browser authorization. If the user has not already chosen a route and an interactive browser capability is available, use the capability-routing rule above to ask one question in the user's language: whether to use their current authenticated browser session, including institutional or VPN access, to download the listed papers. In a structured tool, offer:
+
+1. **Use browser (recommended):** download authorized publisher PDFs and resume the run.
+2. **Show links only:** present `fulltext-requests.md` for manual download or attachment.
+
+State the number of pending papers. Explain that the browser will use the user's existing session and save local copies; the agent will not request or enter credentials. If no browser capability exists, go directly to the links-only route.
+
+## Browser-assisted acquisition
+
+Browser consent applies only to the pending papers named in `fulltext-requests.md`. After opt-in:
+
+1. The parent agent owns browser acquisition and shared-file writes. Use the first browser automation capability already exposed by the harness, such as Codex `@Browser` or an equivalent tool, and reuse the user's existing browser profile and VPN state. Keep browser work in the parent by default so authorization, download mapping, and user handoff stay coherent.
+2. Skip papers that already have a valid local PDF. Open the remaining DOI or article links in separate tabs, in bounded batches of at most four. Prefer the publisher's PDF or Download PDF control and reduce concurrency if a site signals throttling.
+3. Wait until each tab exposes its intended download control, then trigger the ready downloads concurrently using the harness's parallel tool-call mechanism, such as `Promise.allSettled`. Capture each download's returned filename or path when available.
+4. If a tab was still loading or its first click produced no file, refresh or retry that paper once in the next batch. Keep login, CAPTCHA, terms, VPN-change, purchase, or unavailable cases unresolved; continue independent tabs and collect any required user handoffs into one request after the batch. Never read, request, or enter credentials.
+5. Verify the batch after downloads settle. Prefer returned download paths; when the browser does not expose them, compare one download-directory snapshot before and after the batch instead of rescanning after every click. Require `%PDF-`, hash files for duplicate detection, and copy valid files into `<run-dir>/fulltext/inbox/` under the browser-assigned filename. Preserve existing files and collision suffixes.
+6. After all batches finish, rerun the same `prepare` command once. Continue the normal flow from its returned status and report any papers still unresolved.
+
+Use sub-agents for link preflight and post-download parsing or stance analysis. Delegate browser batches only when the harness explicitly gives workers the same authorized browser session and disjoint tab handles; workers return download records while the parent verifies files and writes shared artifacts.
+
+Do not install a browser integration as a hidden prerequisite. When browser automation is unavailable or declined, provide `fulltext-requests.md` and accept any legally accessible files by attachment or `fulltext/inbox/`.
 
 ## External upload or paid access
 
