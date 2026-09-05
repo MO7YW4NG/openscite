@@ -1,5 +1,7 @@
 # OpenScite
 
+[English](README.md) | [繁體中文](README.zh-TW.md)
+
 > Give your agent one scholarly PDF. Get a ranked, evidence-linked map of how later papers support, contrast with, or mention it.
 
 OpenScite is an open-source [Agent Skill](https://agentskills.io/) for incoming-citation analysis. It resolves the paper represented by the PDF, finds works that cite it, prioritizes the citing papers most likely to contain useful evidence, retrieves legally accessible full text, extracts the exact citation passages, and writes the report in the user's language.
